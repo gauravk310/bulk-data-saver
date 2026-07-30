@@ -1198,6 +1198,10 @@
             <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
             Section Fill
           </button>
+          <button id="btn-bulk-file-content" class="btn btn-secondary">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            Bulk File Content
+          </button>
         </div>
         <div class="bottom-bar-right">
           <button id="btn-import-trigger" class="btn btn-secondary">
@@ -1277,6 +1281,32 @@
     </div>
   </div>
 
+  <!-- Bulk File Content Modal -->
+  <div id="bulk-file-content-modal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 500px;">
+      <div class="modal-body">
+        <h3 class="modal-title">Bulk File Content Fill</h3>
+        <p class="modal-desc" style="margin-bottom: 1rem;">Select a section and enter an array of strings (either as a JSON array like <code>["content 1", "content 2"]</code> or as line-by-line items) to fill that section sequentially across chapters.</p>
+        
+        <div class="form-group" style="margin-bottom: 1.25rem;">
+          <label for="bulk-file-section-select" class="form-label">Select Section</label>
+          <select id="bulk-file-section-select" class="form-input" style="appearance: auto; padding: 0.75rem 1rem;">
+            <!-- Rendered dynamically -->
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="bulk-file-content-input" class="form-label">Sequential Content (JSON Array or Newline-separated)</label>
+          <textarea id="bulk-file-content-input" class="section-textarea" style="min-height: 180px; font-family: monospace; font-size: 0.9rem;" placeholder='["First Chapter Content", "Second Chapter Content"]&#10;or&#10;First Chapter Content&#10;Second Chapter Content'></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="btn-bulk-file-cancel" class="btn btn-secondary">Cancel</button>
+        <button id="btn-bulk-file-submit" class="btn btn-primary">Fill Sequentially</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Footer Information -->
   <footer class="footer">
     Chapter & Section Organizer • Built in a Premium Light Theme
@@ -1302,6 +1332,7 @@
     const btnAddChapter = document.getElementById('btn-add-chapter');
     const btnBulkAddChapters = document.getElementById('btn-bulk-add-chapters');
     const btnSectionFill = document.getElementById('btn-section-fill');
+    const btnBulkFileContent = document.getElementById('btn-bulk-file-content');
     const btnExportJson = document.getElementById('btn-export-json');
     const btnImportTrigger = document.getElementById('btn-import-trigger');
     const importFileInput = document.getElementById('import-file-input');
@@ -1335,6 +1366,12 @@
     const fillSectionInput = document.getElementById('fill-section-input');
     const btnFillCancel = document.getElementById('btn-fill-cancel');
     const btnFillSubmit = document.getElementById('btn-fill-submit');
+
+    const bulkFileContentModal = document.getElementById('bulk-file-content-modal');
+    const bulkFileSectionSelect = document.getElementById('bulk-file-section-select');
+    const bulkFileContentInput = document.getElementById('bulk-file-content-input');
+    const btnBulkFileCancel = document.getElementById('btn-bulk-file-cancel');
+    const btnBulkFileSubmit = document.getElementById('btn-bulk-file-submit');
 
     // Default Section Template Names
     const defaultSectionNames = [
@@ -1450,6 +1487,36 @@
 
       btnFillSubmit.addEventListener('click', submitSectionFill);
 
+      // Bulk File Content Fill
+      btnBulkFileContent.addEventListener('click', () => {
+        if (!state.activeSubject || !state.savedSubjects[state.activeSubject]) return;
+        const activeData = state.savedSubjects[state.activeSubject];
+        
+        if (activeData.chapters.length === 0) {
+          showToast("No chapters available to fill.", "warning");
+          return;
+        }
+
+        // Dynamically populate select dropdown
+        bulkFileSectionSelect.innerHTML = '';
+        activeData.sections.forEach(sec => {
+          const opt = document.createElement('option');
+          opt.value = sec;
+          opt.innerText = sec;
+          bulkFileSectionSelect.appendChild(opt);
+        });
+
+        bulkFileContentInput.value = '';
+        bulkFileContentModal.style.display = 'flex';
+        bulkFileContentInput.focus();
+      });
+
+      btnBulkFileCancel.addEventListener('click', () => {
+        bulkFileContentModal.style.display = 'none';
+      });
+
+      btnBulkFileSubmit.addEventListener('click', submitBulkFileContent);
+
       // Export JSON
       btnExportJson.addEventListener('click', exportDataAsJson);
 
@@ -1483,6 +1550,7 @@
         btnAddChapter.style.display = 'inline-flex'; // show Add Chapter
         btnBulkAddChapters.style.display = 'inline-flex'; // show Bulk Add Chapters
         btnSectionFill.style.display = 'inline-flex'; // show Section Fill
+        btnBulkFileContent.style.display = 'inline-flex'; // show Bulk File Content
         renderChaptersList(); // refresh list
       } else {
         tabPreview.classList.add('active-toggle');
@@ -1492,6 +1560,7 @@
         btnAddChapter.style.display = 'none'; // hide Add Chapter
         btnBulkAddChapters.style.display = 'none'; // hide Bulk Add Chapters
         btnSectionFill.style.display = 'none'; // hide Section Fill
+        btnBulkFileContent.style.display = 'none'; // hide Bulk File Content
         renderPreviewTab(); // render quick copy preview rows
       }
     }
@@ -1849,6 +1918,68 @@
           sectionFillModal.style.display = 'flex';
         },
         "Fill Section",
+        false
+      );
+    }
+
+    // Bulk sequential fill data for a specific section across chapters in order
+    function submitBulkFileContent() {
+      if (!state.activeSubject || !state.savedSubjects[state.activeSubject]) return;
+      const activeData = state.savedSubjects[state.activeSubject];
+      
+      const selectedSection = bulkFileSectionSelect.value;
+      const rawInput = bulkFileContentInput.value.trim();
+      
+      if (!selectedSection) {
+        showToast("No section selected.", "warning");
+        return;
+      }
+      if (!rawInput) {
+        showToast("Please enter sequential content.", "warning");
+        return;
+      }
+
+      let items = [];
+      
+      // Parse JSON array if formatted as JSON
+      if (rawInput.startsWith('[') && rawInput.endsWith(']')) {
+        try {
+          const parsed = JSON.parse(rawInput);
+          if (Array.isArray(parsed)) {
+            items = parsed.map(item => String(item));
+          } else {
+            throw new Error("JSON is not an array");
+          }
+        } catch (e) {
+          // Fallback to split newline
+          items = rawInput.split('\n').map(line => line.replace(/\r$/, ''));
+        }
+      } else {
+        // Split newline
+        items = rawInput.split('\n').map(line => line.replace(/\r$/, ''));
+      }
+
+      // Temporarily hide the modal
+      bulkFileContentModal.style.display = 'none';
+
+      showConfirmModal(
+        "Confirm Bulk File Content Fill?",
+        `Are you sure you want to fill "${selectedSection}" sequentially across chapters in order? This will overwrite existing content in that section for all chapters.`,
+        () => {
+          // Update all chapters
+          activeData.chapters.forEach((ch, idx) => {
+            ch.content[selectedSection] = items[idx] !== undefined ? items[idx] : "";
+          });
+          
+          saveStateToLocalStorage();
+          renderChaptersList();
+          showToast(`Successfully filled section "${selectedSection}" sequentially!`, "success");
+        },
+        () => {
+          // Cancel callback: restore the modal
+          bulkFileContentModal.style.display = 'flex';
+        },
+        "Fill Sequentially",
         false
       );
     }

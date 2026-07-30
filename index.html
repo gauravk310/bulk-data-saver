@@ -1190,6 +1190,10 @@
             <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
             Bulk Add
           </button>
+          <button id="btn-section-fill" class="btn btn-secondary">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+            Section Fill
+          </button>
         </div>
         <div class="bottom-bar-right">
           <button id="btn-import-trigger" class="btn btn-secondary">
@@ -1243,6 +1247,32 @@
     </div>
   </div>
 
+  <!-- Section Fill Modal -->
+  <div id="section-fill-modal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 500px;">
+      <div class="modal-body">
+        <h3 class="modal-title">Bulk Fill Section</h3>
+        <p class="modal-desc" style="margin-bottom: 1rem;">Select a section and enter the content to apply to all chapters for this section.</p>
+        
+        <div class="form-group" style="margin-bottom: 1.25rem;">
+          <label for="fill-section-select" class="form-label">Select Section</label>
+          <select id="fill-section-select" class="form-input" style="appearance: auto; padding: 0.75rem 1rem;">
+            <!-- Rendered dynamically -->
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="fill-section-input" class="form-label">Content</label>
+          <textarea id="fill-section-input" class="section-textarea" style="min-height: 180px;" placeholder="Type or paste the content that will be filled into the selected section for all chapters..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="btn-fill-cancel" class="btn btn-secondary">Cancel</button>
+        <button id="btn-fill-submit" class="btn btn-primary">Fill All Chapters</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Footer Information -->
   <footer class="footer">
     Chapter & Section Organizer • Built in a Premium Light Theme
@@ -1267,6 +1297,7 @@
     const chaptersList = document.getElementById('chapters-list');
     const btnAddChapter = document.getElementById('btn-add-chapter');
     const btnBulkAddChapters = document.getElementById('btn-bulk-add-chapters');
+    const btnSectionFill = document.getElementById('btn-section-fill');
     const btnExportJson = document.getElementById('btn-export-json');
     const btnImportTrigger = document.getElementById('btn-import-trigger');
     const importFileInput = document.getElementById('import-file-input');
@@ -1293,6 +1324,12 @@
     const bulkChaptersInput = document.getElementById('bulk-chapters-input');
     const btnBulkCancel = document.getElementById('btn-bulk-cancel');
     const btnBulkSubmit = document.getElementById('btn-bulk-submit');
+
+    const sectionFillModal = document.getElementById('section-fill-modal');
+    const fillSectionSelect = document.getElementById('fill-section-select');
+    const fillSectionInput = document.getElementById('fill-section-input');
+    const btnFillCancel = document.getElementById('btn-fill-cancel');
+    const btnFillSubmit = document.getElementById('btn-fill-submit');
 
     // Default Section Template Names
     const defaultSectionNames = [
@@ -1375,6 +1412,36 @@
 
       btnBulkSubmit.addEventListener('click', submitBulkChapters);
 
+      // Section Fill
+      btnSectionFill.addEventListener('click', () => {
+        if (!state.activeSubject || !state.savedSubjects[state.activeSubject]) return;
+        const activeData = state.savedSubjects[state.activeSubject];
+        
+        if (activeData.chapters.length === 0) {
+          showToast("No chapters available to fill.", "warning");
+          return;
+        }
+
+        // Dynamically populate select dropdown
+        fillSectionSelect.innerHTML = '';
+        activeData.sections.forEach(sec => {
+          const opt = document.createElement('option');
+          opt.value = sec;
+          opt.innerText = sec;
+          fillSectionSelect.appendChild(opt);
+        });
+
+        fillSectionInput.value = '';
+        sectionFillModal.style.display = 'flex';
+        fillSectionInput.focus();
+      });
+
+      btnFillCancel.addEventListener('click', () => {
+        sectionFillModal.style.display = 'none';
+      });
+
+      btnFillSubmit.addEventListener('click', submitSectionFill);
+
       // Export JSON
       btnExportJson.addEventListener('click', exportDataAsJson);
 
@@ -1404,6 +1471,7 @@
         previewTabContent.style.display = 'none';
         btnAddChapter.style.display = 'inline-flex'; // show Add Chapter
         btnBulkAddChapters.style.display = 'inline-flex'; // show Bulk Add Chapters
+        btnSectionFill.style.display = 'inline-flex'; // show Section Fill
         renderChaptersList(); // refresh list
       } else {
         tabPreview.classList.add('active-toggle');
@@ -1412,6 +1480,7 @@
         previewTabContent.style.display = 'block';
         btnAddChapter.style.display = 'none'; // hide Add Chapter
         btnBulkAddChapters.style.display = 'none'; // hide Bulk Add Chapters
+        btnSectionFill.style.display = 'none'; // hide Section Fill
         renderPreviewTab(); // render quick copy preview rows
       }
     }
@@ -1730,6 +1799,36 @@
       renderChaptersList();
       bulkModal.style.display = 'none';
       showToast(`Successfully added ${names.length} chapters!`, "success");
+    }
+
+    // Bulk fill data for a specific section across all chapters
+    function submitSectionFill() {
+      if (!state.activeSubject || !state.savedSubjects[state.activeSubject]) return;
+      const activeData = state.savedSubjects[state.activeSubject];
+      
+      const selectedSection = fillSectionSelect.value;
+      const fillContent = fillSectionInput.value;
+      
+      if (!selectedSection) {
+        showToast("No section selected.", "warning");
+        return;
+      }
+
+      showConfirmModal(
+        "Confirm Section Fill?",
+        `Are you sure you want to fill "${selectedSection}" in all ${activeData.chapters.length} chapters with this content? This will overwrite existing content in that section.`,
+        () => {
+          // Update all chapters
+          activeData.chapters.forEach(ch => {
+            ch.content[selectedSection] = fillContent;
+          });
+          
+          saveStateToLocalStorage();
+          renderChaptersList();
+          sectionFillModal.style.display = 'none';
+          showToast(`Successfully filled section "${selectedSection}" for all chapters!`, "success");
+        }
+      );
     }
 
     // Delete a chapter

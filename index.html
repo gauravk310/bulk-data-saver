@@ -967,6 +967,10 @@
       padding: 1rem;
     }
 
+    #confirm-modal {
+      z-index: 1100;
+    }
+
     .modal-card {
       background-color: var(--bg-card);
       border-radius: var(--radius-lg);
@@ -1319,6 +1323,7 @@
     const modalCancel = document.getElementById('modal-cancel');
     const modalConfirm = document.getElementById('modal-confirm');
     let modalActionCallback = null;
+    let modalCancelCallback = null;
 
     const bulkModal = document.getElementById('bulk-modal');
     const bulkChaptersInput = document.getElementById('bulk-chapters-input');
@@ -1382,7 +1387,10 @@
             renderSuggestionsList();
             showConfigView();
             showToast("Returned to setup screen", "warning");
-          }
+          },
+          null,
+          "Reset Workspace",
+          true
         );
       });
 
@@ -1453,12 +1461,15 @@
       importFileInput.addEventListener('change', handleImportFile);
 
       // Modal buttons
-      modalCancel.addEventListener('click', hideConfirmModal);
+      modalCancel.addEventListener('click', () => {
+        hideConfirmModal(false);
+      });
       modalConfirm.addEventListener('click', () => {
-        if (modalActionCallback) {
-          modalActionCallback();
+        const actionCb = modalActionCallback;
+        hideConfirmModal(true);
+        if (actionCb) {
+          actionCb();
         }
-        hideConfirmModal();
       });
     }
 
@@ -1599,7 +1610,10 @@
               saveStateToLocalStorage();
               renderSuggestionsList();
               showToast(`Deleted subject: ${sub}`, "warning");
-            }
+            },
+            null,
+            "Delete Subject",
+            true
           );
         });
 
@@ -1814,6 +1828,9 @@
         return;
       }
 
+      // Temporarily hide the section fill modal so confirm modal is not behind it
+      sectionFillModal.style.display = 'none';
+
       showConfirmModal(
         "Confirm Section Fill?",
         `Are you sure you want to fill "${selectedSection}" in all ${activeData.chapters.length} chapters with this content? This will overwrite existing content in that section.`,
@@ -1825,9 +1842,14 @@
           
           saveStateToLocalStorage();
           renderChaptersList();
-          sectionFillModal.style.display = 'none';
           showToast(`Successfully filled section "${selectedSection}" for all chapters!`, "success");
-        }
+        },
+        () => {
+          // Cancel callback: restore the section fill modal
+          sectionFillModal.style.display = 'flex';
+        },
+        "Fill Section",
+        false
       );
     }
 
@@ -1855,7 +1877,10 @@
               showToast("Chapter deleted successfully", "warning");
             });
           }
-        }
+        },
+        null,
+        "Delete Chapter",
+        true
       );
     }
 
@@ -1968,7 +1993,23 @@
         const row = document.createElement('div');
         row.className = 'preview-row-card fade-in';
 
-        let buttonsHTML = '';
+        const hasContent = activeData.sections.some(secName => {
+          const contentText = chapter.content[secName] || "";
+          return contentText.trim() !== "";
+        });
+
+        let buttonsHTML = `
+          <button class="btn-preview-copy btn-copy-all ${!hasContent ? 'empty-sec' : ''}" 
+                  data-chapter-id="${chapter.id}" 
+                  style="background-color: var(--success-light); border-color: var(--success-border); color: var(--success);"
+                  title="Copy All Sections Concatenated">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+            </svg>
+            Copy All
+          </button>
+        `;
+
         activeData.sections.forEach(secName => {
           const contentText = chapter.content[secName] || "";
           const isEmpty = contentText.trim() === "";
@@ -2000,7 +2041,7 @@
       });
 
       // Bind click triggers for copy buttons in the preview tab
-      const copyBtns = previewTabContent.querySelectorAll('.btn-preview-copy');
+      const copyBtns = previewTabContent.querySelectorAll('.btn-preview-copy:not(.btn-copy-all)');
       copyBtns.forEach(btn => {
         btn.addEventListener('click', () => {
           const chId = btn.getAttribute('data-chapter-id');
@@ -2010,6 +2051,27 @@
           if (chapter) {
             const textVal = chapter.content[secName] || "";
             copyPreviewText(textVal, secName, chapter.title, btn);
+          }
+        });
+      });
+
+      // Bind click triggers for copy all buttons in the preview tab
+      const copyAllBtns = previewTabContent.querySelectorAll('.btn-copy-all');
+      copyAllBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const chId = btn.getAttribute('data-chapter-id');
+          const chapter = activeData.chapters.find(ch => ch.id === chId);
+
+          if (chapter) {
+            const allTexts = [];
+            activeData.sections.forEach(secName => {
+              const val = chapter.content[secName];
+              if (val && val.trim()) {
+                allTexts.push(val.trim());
+              }
+            });
+            const concatenatedText = allTexts.join('\n\n');
+            copyPreviewText(concatenatedText, "All Sections", chapter.title, btn);
           }
         });
       });
@@ -2262,7 +2324,10 @@
             showConfirmModal(
               "Import Subject?",
               `Importing this file will load "${importedSubject}" as your active subject workspace.`,
-              importAction
+              importAction,
+              null,
+              "Import Subject",
+              false
             );
           } else {
             importAction();
@@ -2281,16 +2346,33 @@
     }
 
     // Modal helpers
-    function showConfirmModal(title, desc, callback) {
+    function showConfirmModal(title, desc, confirmCallback, cancelCallback = null, confirmText = "Confirm", isDestructive = false) {
       modalTitle.innerText = title;
       modalDesc.innerText = desc;
-      modalActionCallback = callback;
+      modalConfirm.innerText = confirmText;
+      
+      // Update styling based on destructive action
+      if (isDestructive) {
+        modalConfirm.style.backgroundColor = 'var(--danger)';
+        modalConfirm.style.borderColor = 'var(--danger)';
+      } else {
+        modalConfirm.style.backgroundColor = 'var(--primary)';
+        modalConfirm.style.borderColor = 'var(--primary)';
+      }
+      
+      modalActionCallback = confirmCallback;
+      modalCancelCallback = cancelCallback;
       confirmModal.style.display = 'flex';
     }
 
-    function hideConfirmModal() {
+    function hideConfirmModal(isConfirmed = false) {
       confirmModal.style.display = 'none';
+      const cancelCb = modalCancelCallback;
       modalActionCallback = null;
+      modalCancelCallback = null;
+      if (!isConfirmed && cancelCb) {
+        cancelCb();
+      }
     }
 
     // Toast helpers

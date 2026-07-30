@@ -1,0 +1,2232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter & Section Organizer</title>
+  <!-- Google Fonts for premium typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    /* CSS Variables for Premium Design System */
+    :root {
+      --bg-primary: #f8fafc;
+      --bg-card: #ffffff;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #94a3b8;
+      
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --primary-light: #eff6ff;
+      --primary-border: #bfdbfe;
+      
+      --border: #e2e8f0;
+      --border-focus: #3b82f6;
+      
+      --success: #10b981;
+      --success-hover: #059669;
+      --success-light: #ecfdf5;
+      --success-border: #a7f3d0;
+      
+      --danger: #ef4444;
+      --danger-hover: #dc2626;
+      --danger-light: #fef2f2;
+      --danger-border: #fecaca;
+      
+      --warning: #f59e0b;
+      --warning-light: #fef3c7;
+      
+      --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.08);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.08);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.08);
+      
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 18px;
+      --radius-full: 9999px;
+      
+      --font-heading: 'Outfit', sans-serif;
+      --font-body: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    /* Reset & Base Styles */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 0;
+      margin: 0;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(37, 99, 235, 0.03) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.03) 0px, transparent 50%);
+    }
+
+    h1, h2, h3, h4 {
+      font-family: var(--font-heading);
+      font-weight: 600;
+    }
+
+    button, input, textarea {
+      font-family: inherit;
+    }
+
+    /* Scrollbar Styling */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg-primary);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: var(--radius-full);
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--text-muted);
+    }
+
+    /* Container */
+    .container {
+      width: 100%;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Transitions & Animations */
+    .fade-in {
+      animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .slide-out {
+      animation: slideOut 0.3s cubic-bezier(0.7, 0, 0.84, 0) forwards;
+    }
+
+    @keyframes slideOut {
+      to { opacity: 0; transform: scale(0.95); max-height: 0; padding-top: 0; padding-bottom: 0; margin-top: 0; margin-bottom: 0; overflow: hidden; border: none; }
+    }
+
+    /* --- STEP 1: CONFIGURATION SCREEN --- */
+    .config-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-xl);
+      padding: 2.5rem;
+      max-width: 600px;
+      margin: 3rem auto;
+      width: 100%;
+    }
+
+    .config-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .config-header .logo-icon {
+      background-color: var(--primary-light);
+      color: var(--primary);
+      width: 56px;
+      height: 56px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1rem;
+      font-size: 1.75rem;
+      box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.1);
+    }
+
+    .config-header h1 {
+      font-size: 1.75rem;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .config-header p {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .form-label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 0.95rem;
+      background-color: var(--bg-primary);
+      transition: all 0.2s ease;
+      color: var(--text-primary);
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--border-focus);
+      background-color: var(--bg-card);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    }
+
+    .section-names-container {
+      margin-top: 1rem;
+      border-top: 1px solid var(--border);
+      padding-top: 1.25rem;
+      max-height: 200px;
+      overflow-y: auto;
+      padding-right: 0.5rem;
+    }
+
+    .section-name-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .section-number {
+      font-family: var(--font-heading);
+      background-color: var(--bg-primary);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.25rem;
+      font-weight: 600;
+      font-size: 0.95rem;
+      border-radius: var(--radius-md);
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      width: 100%;
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: #ffffff;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-primary:hover {
+      background-color: var(--primary-hover);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    .btn-secondary {
+      background-color: var(--bg-card);
+      border-color: var(--border);
+      color: var(--text-secondary);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-secondary:hover {
+      background-color: var(--bg-primary);
+      border-color: var(--text-muted);
+      color: var(--text-primary);
+    }
+
+    .btn-danger-outline {
+      background-color: transparent;
+      border-color: var(--danger-border);
+      color: var(--danger);
+    }
+
+    .btn-danger-outline:hover {
+      background-color: var(--danger-light);
+      border-color: var(--danger);
+    }
+
+    .btn-success {
+      background-color: var(--success);
+      color: #ffffff;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-success:hover {
+      background-color: var(--success-hover);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+
+    /* Suggestions Area in Setup View */
+    .suggestions-container {
+      margin-top: 2rem;
+      border-top: 1px solid var(--border);
+      padding-top: 1.5rem;
+    }
+
+    .suggestions-title {
+      font-size: 0.825rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+    }
+
+    .suggestions-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .btn-suggestion {
+      background-color: var(--bg-primary);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      padding: 0.4rem 0.85rem;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-weight: 550;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-suggestion:hover {
+      background-color: var(--primary-light);
+      border-color: var(--primary-border);
+      color: var(--primary);
+    }
+
+    .btn-suggestion-delete {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 2px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+    }
+
+    .btn-suggestion-delete:hover {
+      background-color: var(--danger-light);
+      color: var(--danger);
+    }
+
+    /* --- STEP 2: MAIN EDITOR SCREEN --- */
+    .editor-layout {
+      display: none; /* Controlled by JS */
+      flex-direction: column;
+      gap: 2rem;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Top Bar */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      background-color: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1rem 1.5rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-icon {
+      background-color: var(--primary-light);
+      color: var(--primary);
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.15rem;
+      box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.1);
+    }
+
+    .brand-section h2 {
+      font-size: 1.25rem;
+      color: var(--text-primary);
+    }
+
+    .brand-section h2 span {
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    .status-badge {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.25rem 0.625rem;
+      border-radius: var(--radius-full);
+      background-color: var(--success-light);
+      color: var(--success);
+      border: 1px solid var(--success-border);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      margin-top: 0.15rem;
+    }
+
+    .status-badge .dot {
+      width: 6px;
+      height: 6px;
+      background-color: var(--success);
+      border-radius: 50%;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(0.95); opacity: 0.5; }
+      50% { transform: scale(1.2); opacity: 1; }
+      100% { transform: scale(0.95); opacity: 0.5; }
+    }
+
+    /* Segmented View Toggles styling */
+    .view-toggle-group {
+      display: flex;
+      background-color: var(--bg-primary);
+      padding: 4px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+    }
+
+    .toggle-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 0.45rem 1rem;
+      border-radius: calc(var(--radius-md) - 2px);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.2s ease;
+    }
+
+    .toggle-btn:hover {
+      color: var(--text-primary);
+    }
+
+    .toggle-btn.active-toggle {
+      background-color: var(--bg-card);
+      color: var(--primary);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .top-actions .btn {
+      width: auto;
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+    }
+
+    /* Template Header */
+    .template-header-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1.25rem 1.5rem;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .template-info-title {
+      font-size: 0.875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      font-weight: 700;
+    }
+
+    .template-sections-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .section-pill {
+      font-size: 0.85rem;
+      padding: 0.35rem 0.85rem;
+      background-color: var(--bg-primary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-full);
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 500;
+    }
+
+    .section-pill-number {
+      background-color: var(--primary-light);
+      color: var(--primary);
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+
+    /* Chapters Area */
+    .chapters-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1.75rem;
+    }
+
+    .empty-state {
+      background-color: var(--bg-card);
+      border: 2px dashed var(--border);
+      border-radius: var(--radius-lg);
+      padding: 4rem 2rem;
+      text-align: center;
+      color: var(--text-secondary);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .empty-state-icon {
+      font-size: 3rem;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+
+    .empty-state h3 {
+      font-size: 1.25rem;
+      margin-bottom: 0.5rem;
+      color: var(--text-primary);
+    }
+
+    .empty-state p {
+      font-size: 0.95rem;
+      margin-bottom: 1.5rem;
+      color: var(--text-muted);
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .empty-state .btn {
+      width: auto;
+    }
+
+    /* Chapter Card */
+    .chapter-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      padding: 2rem;
+      position: relative;
+      transition: box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+
+    .chapter-card:hover {
+      box-shadow: var(--shadow-lg);
+      border-color: var(--primary-border);
+    }
+
+    .chapter-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .chapter-title-wrapper {
+      flex-grow: 1;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .chapter-badge {
+      font-family: var(--font-heading);
+      background-color: var(--primary-light);
+      color: var(--primary);
+      padding: 0.35rem 0.85rem;
+      border-radius: var(--radius-md);
+      font-weight: 700;
+      font-size: 0.9rem;
+      white-space: nowrap;
+      border: 1px solid var(--primary-border);
+    }
+
+    .chapter-title-input {
+      font-family: var(--font-heading);
+      font-size: 1.25rem;
+      font-weight: 600;
+      border: 1px solid transparent;
+      border-radius: var(--radius-sm);
+      padding: 0.35rem 0.75rem;
+      width: 100%;
+      color: var(--text-primary);
+      transition: all 0.2s ease;
+      background: transparent;
+    }
+
+    .chapter-title-input:hover {
+      background-color: var(--bg-primary);
+      border-color: var(--border);
+    }
+
+    .chapter-title-input:focus {
+      background-color: var(--bg-card);
+      border-color: var(--border-focus);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+    }
+
+    .btn-delete-chapter {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .btn-delete-chapter:hover {
+      background-color: var(--danger-light);
+      color: var(--danger);
+    }
+
+    /* Chapter Section Editor Form */
+    .chapter-sections {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .chapter-section-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .section-meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .section-label {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .section-label-number {
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .section-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .btn-icon-sm {
+      background-color: var(--bg-primary);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      border-radius: var(--radius-sm);
+      width: 30px;
+      height: 30px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      position: relative;
+    }
+
+    .btn-icon-sm:hover {
+      background-color: var(--bg-card);
+      border-color: var(--text-muted);
+      color: var(--text-primary);
+    }
+
+    .btn-icon-sm svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    /* Custom classes for copy success */
+    .btn-icon-sm.success-active {
+      background-color: var(--success-light);
+      border-color: var(--success-border);
+      color: var(--success);
+    }
+
+    .section-textarea {
+      width: 100%;
+      min-height: 120px;
+      max-height: 500px;
+      resize: vertical;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      font-size: 0.95rem;
+      color: var(--text-primary);
+      line-height: 1.6;
+      background-color: var(--bg-card);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .section-textarea:focus {
+      outline: none;
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+    }
+
+    /* --- STEP 3: PREVIEW VIEW DESIGN --- */
+    .preview-row-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1.25rem 1.5rem;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1.5rem;
+      margin-bottom: 1rem;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .preview-row-card:hover {
+      border-color: var(--primary-border);
+      box-shadow: var(--shadow-md);
+    }
+
+    .preview-row-title-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      min-width: 0;
+    }
+
+    .preview-row-badge {
+      font-family: var(--font-heading);
+      background-color: var(--bg-primary);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.25rem 0.55rem;
+      border-radius: var(--radius-sm);
+      white-space: nowrap;
+    }
+
+    .preview-row-title {
+      font-family: var(--font-heading);
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .preview-row-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      flex-shrink: 0;
+    }
+
+    .btn-preview-copy {
+      background-color: var(--primary-light);
+      border: 1px solid var(--primary-border);
+      color: var(--primary);
+      font-size: 0.8rem;
+      padding: 0.4rem 0.85rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .btn-preview-copy:hover {
+      background-color: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+    }
+
+    /* Style for empty sections */
+    .btn-preview-copy.empty-sec {
+      opacity: 0.55;
+      background-color: var(--bg-primary);
+      border-color: var(--border);
+      color: var(--text-secondary);
+    }
+
+    .btn-preview-copy.empty-sec:hover {
+      opacity: 1;
+      background-color: var(--primary-light);
+      border-color: var(--primary-border);
+      color: var(--primary);
+    }
+
+    /* Active copy class inside preview */
+    .btn-preview-copy.preview-copied {
+      background-color: var(--success-light) !important;
+      border-color: var(--success-border) !important;
+      color: var(--success) !important;
+    }
+
+    /* Bottom Control Bar */
+    .bottom-bar {
+      margin-top: 3rem;
+      margin-bottom: 2rem;
+      background-color: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem 2rem;
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      position: sticky;
+      bottom: 1.5rem;
+      z-index: 100;
+    }
+
+    .bottom-bar-left {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .bottom-bar-right {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .bottom-bar .btn {
+      width: auto;
+      min-width: 120px;
+    }
+
+    /* Toast System */
+    .toast-container {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      z-index: 9999;
+      pointer-events: none;
+    }
+
+    .toast {
+      background-color: #1e293b;
+      color: #ffffff;
+      padding: 0.75rem 1.25rem;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      pointer-events: auto;
+      animation: toastIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      max-width: 320px;
+      border-left: 4px solid var(--primary);
+    }
+
+    .toast.toast-success {
+      border-left-color: var(--success);
+    }
+
+    .toast.toast-warning {
+      border-left-color: var(--warning);
+    }
+
+    .toast.toast-danger {
+      border-left-color: var(--danger);
+    }
+
+    @keyframes toastIn {
+      from { transform: translateY(12px) scale(0.95); opacity: 0; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+
+    .toast.toast-out {
+      animation: toastOut 0.3s cubic-bezier(0.7, 0, 0.84, 0) forwards;
+    }
+
+    @keyframes toastOut {
+      to { transform: translateY(8px); opacity: 0; }
+    }
+
+    /* Modal dialog */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(15, 23, 42, 0.4);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      display: none; /* Controlled by JS */
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .modal-card {
+      background-color: var(--bg-card);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-xl);
+      max-width: 480px;
+      width: 100%;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      animation: modalIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    @keyframes modalIn {
+      from { transform: scale(0.95) translateY(8px); opacity: 0; }
+      to { transform: scale(1) translateY(0); opacity: 1; }
+    }
+
+    .modal-body {
+      padding: 1.75rem;
+    }
+
+    .modal-title {
+      font-size: 1.25rem;
+      margin-bottom: 0.75rem;
+      color: var(--text-primary);
+    }
+
+    .modal-desc {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .modal-footer {
+      background-color: var(--bg-primary);
+      padding: 1rem 1.75rem;
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .modal-footer .btn {
+      width: auto;
+    }
+
+    /* File Import Input styling */
+    #import-file-input {
+      display: none;
+    }
+
+    /* Tooltip styling */
+    .tooltip-text {
+      visibility: hidden;
+      width: 80px;
+      background-color: #1e293b;
+      color: #fff;
+      text-align: center;
+      border-radius: var(--radius-sm);
+      padding: 4px 0;
+      position: absolute;
+      z-index: 10;
+      bottom: 125%;
+      left: 50%;
+      margin-left: -40px;
+      opacity: 0;
+      transition: opacity 0.2s;
+      font-size: 0.75rem;
+      pointer-events: none;
+    }
+
+    .btn-icon-sm:hover .tooltip-text {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    /* Footer Copyright */
+    .footer {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      padding: 1.5rem;
+      border-top: 1px solid var(--border);
+      background-color: var(--bg-card);
+      margin-top: auto;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .bottom-bar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .bottom-bar-left, .bottom-bar-right {
+        flex-direction: column;
+      }
+      .bottom-bar .btn {
+        width: 100%;
+      }
+      .top-bar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .top-actions {
+        flex-direction: column;
+        width: 100%;
+      }
+      .top-actions .btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <!-- STEP 1: CONFIGURATION VIEW -->
+    <div id="config-view" class="config-card fade-in">
+      <div class="config-header">
+        <div class="logo-icon">📋</div>
+        <h1>Setup Chapter Sections</h1>
+        <p>Define your subject, number of sections, and names. You can then add chapters and write content.</p>
+      </div>
+
+      <div class="form-group">
+        <label for="subject-name" class="form-label">Subject Name</label>
+        <input type="text" id="subject-name" class="form-input" placeholder="e.g. Physics, Biology, History" required>
+      </div>
+
+      <div class="form-group">
+        <label for="num-sections" class="form-label">Number of Sections</label>
+        <input type="number" id="num-sections" class="form-input" min="1" max="20" value="3">
+      </div>
+
+      <label class="form-label">Section Names</label>
+      <div id="section-names-list" class="section-names-container">
+        <!-- Rendered dynamically by JS -->
+      </div>
+
+      <button id="btn-save-config" class="btn btn-primary" style="margin-top: 1.5rem;">
+        Start Writing Chapters
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 5l7 7-7 7M5 5l7 7-7 7"/></svg>
+      </button>
+
+      <!-- Suggestions UI panel for previously saved subjects -->
+      <div id="suggestions-panel" class="suggestions-container" style="display: none;">
+        <div class="suggestions-title">Resume from Saved Subjects</div>
+        <div id="suggestions-list" class="suggestions-list">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2: MAIN WORKSPACE VIEW -->
+    <div id="editor-view" class="editor-layout fade-in">
+      
+      <!-- Top Action Bar -->
+      <div class="top-bar">
+        <div class="brand-section">
+          <div class="brand-icon">📚</div>
+          <div>
+            <h2>Chapters Workspace: <span id="current-subject-display">Physics</span></h2>
+            <div class="status-badge">
+              <span class="dot"></span>
+              Auto-saved to Browser
+            </div>
+          </div>
+        </div>
+        
+        <!-- Segmented Tab Toggle buttons -->
+        <div class="view-toggle-group">
+          <button id="tab-editor" class="toggle-btn active-toggle">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+            Editor Mode
+          </button>
+          <button id="tab-preview" class="toggle-btn">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+            Quick Copy Preview
+          </button>
+        </div>
+
+        <div class="top-actions">
+          <button id="btn-reset-setup" class="btn btn-secondary btn-danger-outline" title="Clear active workspace and start section config over">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 7.89M9 11l3-3 3 3m-3-3v12"/></svg>
+            Reset Template
+          </button>
+        </div>
+      </div>
+
+      <!-- MAIN TABS CONTAINER -->
+      
+      <!-- TAB 1: CONFIGURE/EDITOR TAB -->
+      <div id="editor-tab-content" class="fade-in">
+        <!-- Configured Template Details -->
+        <div class="template-header-card" style="margin-bottom: 1.5rem;">
+          <div class="template-info-title">Active Section Template</div>
+          <div id="template-sections-container" class="template-sections-pills">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+        <!-- Main Chapters List -->
+        <div id="chapters-list" class="chapters-container">
+          <!-- Chapters loaded dynamically -->
+        </div>
+      </div>
+
+      <!-- TAB 2: ROW-BY-ROW QUICK COPY PREVIEW TAB -->
+      <div id="preview-tab-content" class="fade-in" style="display: none;">
+        <!-- Preview rows loaded dynamically -->
+      </div>
+
+      <!-- Dynamic Action Control Bar (Sticky) -->
+      <div class="bottom-bar">
+        <div class="bottom-bar-left">
+          <button id="btn-add-chapter" class="btn btn-primary">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+            Add Chapter
+          </button>
+          <button id="btn-bulk-add-chapters" class="btn btn-secondary">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+            Bulk Add
+          </button>
+        </div>
+        <div class="bottom-bar-right">
+          <button id="btn-import-trigger" class="btn btn-secondary">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+            Import JSON
+          </button>
+          <input type="file" id="import-file-input" accept=".json">
+          
+          <button id="btn-export-json" class="btn btn-success">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+            Export JSON
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Toast Notification Area -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Confirmation Modal Dialog -->
+  <div id="confirm-modal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-body">
+        <h3 id="modal-title" class="modal-title">Reset Workspace?</h3>
+        <p id="modal-desc" class="modal-desc">This action will return you to the Setup configuration screen, but your currently saved subject data in browser memory will not be deleted.</p>
+      </div>
+      <div class="modal-footer">
+        <button id="modal-cancel" class="btn btn-secondary">Cancel</button>
+        <button id="modal-confirm" class="btn btn-primary" style="background-color: var(--danger); border-color: var(--danger);">Reset Workspace</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bulk Add Chapters Modal -->
+  <div id="bulk-modal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 500px;">
+      <div class="modal-body">
+        <h3 class="modal-title">Bulk Add Chapters</h3>
+        <p class="modal-desc" style="margin-bottom: 1rem;">Enter chapter names. You can paste a JSON array of strings (e.g. <code>["Chapter A", "Chapter B"]</code>) or list them one per line.</p>
+        <div class="form-group">
+          <textarea id="bulk-chapters-input" class="section-textarea" style="min-height: 180px; font-family: monospace; font-size: 0.9rem;" placeholder='["Chapter 1", "Chapter 2"]&#10;or&#10;Chapter 1&#10;Chapter 2'></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="btn-bulk-cancel" class="btn btn-secondary">Cancel</button>
+        <button id="btn-bulk-submit" class="btn btn-primary">Add Chapters</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer Information -->
+  <footer class="footer">
+    Chapter & Section Organizer • Built in a Premium Light Theme
+  </footer>
+
+  <script>
+    // State management - database keyed by subject name
+    let state = {
+      activeSubject: null, // string | null (the currently loaded subject)
+      savedSubjects: {} // { [subjectName]: { sections: [...], chapters: [...] } }
+    };
+
+    // DOM Elements
+    const configView = document.getElementById('config-view');
+    const editorView = document.getElementById('editor-view');
+    const subjectNameInput = document.getElementById('subject-name');
+    const numSectionsInput = document.getElementById('num-sections');
+    const sectionNamesList = document.getElementById('section-names-list');
+    const btnSaveConfig = document.getElementById('btn-save-config');
+    const btnResetSetup = document.getElementById('btn-reset-setup');
+    const templateSectionsContainer = document.getElementById('template-sections-container');
+    const chaptersList = document.getElementById('chapters-list');
+    const btnAddChapter = document.getElementById('btn-add-chapter');
+    const btnBulkAddChapters = document.getElementById('btn-bulk-add-chapters');
+    const btnExportJson = document.getElementById('btn-export-json');
+    const btnImportTrigger = document.getElementById('btn-import-trigger');
+    const importFileInput = document.getElementById('import-file-input');
+    const toastContainer = document.getElementById('toast-container');
+    const currentSubjectDisplay = document.getElementById('current-subject-display');
+    const suggestionsPanel = document.getElementById('suggestions-panel');
+    const suggestionsList = document.getElementById('suggestions-list');
+    
+    // Tab toggles & content divs
+    const tabEditor = document.getElementById('tab-editor');
+    const tabPreview = document.getElementById('tab-preview');
+    const editorTabContent = document.getElementById('editor-tab-content');
+    const previewTabContent = document.getElementById('preview-tab-content');
+
+    // Modal Elements
+    const confirmModal = document.getElementById('confirm-modal');
+    const modalTitle = document.getElementById('modal-title');
+    const modalDesc = document.getElementById('modal-desc');
+    const modalCancel = document.getElementById('modal-cancel');
+    const modalConfirm = document.getElementById('modal-confirm');
+    let modalActionCallback = null;
+
+    const bulkModal = document.getElementById('bulk-modal');
+    const bulkChaptersInput = document.getElementById('bulk-chapters-input');
+    const btnBulkCancel = document.getElementById('btn-bulk-cancel');
+    const btnBulkSubmit = document.getElementById('btn-bulk-submit');
+
+    // Default Section Template Names
+    const defaultSectionNames = [
+      "Introduction",
+      "Key Explanations",
+      "Summary & Notes",
+      "Practice Questions",
+      "References"
+    ];
+
+    // Initialization
+    window.addEventListener('DOMContentLoaded', () => {
+      loadStateFromLocalStorage();
+      setupEventListeners();
+      
+      if (state.activeSubject && state.savedSubjects[state.activeSubject]) {
+        // Enforce returning to editor tab on refresh/load
+        switchTab('editor');
+        showEditorView();
+      } else {
+        renderSectionInputs();
+        renderSuggestionsList();
+        showConfigView();
+      }
+    });
+
+    // Setup basic global event listeners
+    function setupEventListeners() {
+      // Config input listener
+      numSectionsInput.addEventListener('input', () => {
+        let count = parseInt(numSectionsInput.value) || 1;
+        if (count < 1) { count = 1; numSectionsInput.value = 1; }
+        if (count > 20) { count = 20; numSectionsInput.value = 20; }
+        renderSectionInputs();
+      });
+
+      // Save Config
+      btnSaveConfig.addEventListener('click', saveConfigAndStart);
+
+      // Reset template trigger - returns to setup, doesn't delete storage registry
+      btnResetSetup.addEventListener('click', () => {
+        showConfirmModal(
+          "Exit Workspace?", 
+          "Exit this workspace and return to the Setup screen? Your current work remains saved in the registry suggestions below.",
+          () => {
+            state.activeSubject = null;
+            saveStateToLocalStorage();
+            switchTab('editor'); // reset tab state
+            renderSectionInputs();
+            renderSuggestionsList();
+            showConfigView();
+            showToast("Returned to setup screen", "warning");
+          }
+        );
+      });
+
+      // Tab toggling click events
+      tabEditor.addEventListener('click', () => {
+        switchTab('editor');
+      });
+      tabPreview.addEventListener('click', () => {
+        switchTab('preview');
+      });
+
+      // Add Chapter
+      btnAddChapter.addEventListener('click', () => {
+        addChapter();
+      });
+
+      // Bulk Add Chapters
+      btnBulkAddChapters.addEventListener('click', () => {
+        bulkChaptersInput.value = '';
+        bulkModal.style.display = 'flex';
+        bulkChaptersInput.focus();
+      });
+
+      btnBulkCancel.addEventListener('click', () => {
+        bulkModal.style.display = 'none';
+      });
+
+      btnBulkSubmit.addEventListener('click', submitBulkChapters);
+
+      // Export JSON
+      btnExportJson.addEventListener('click', exportDataAsJson);
+
+      // Import JSON
+      btnImportTrigger.addEventListener('click', () => {
+        importFileInput.click();
+      });
+
+      importFileInput.addEventListener('change', handleImportFile);
+
+      // Modal buttons
+      modalCancel.addEventListener('click', hideConfirmModal);
+      modalConfirm.addEventListener('click', () => {
+        if (modalActionCallback) {
+          modalActionCallback();
+        }
+        hideConfirmModal();
+      });
+    }
+
+    // Tab switcher logic
+    function switchTab(mode) {
+      if (mode === 'editor') {
+        tabEditor.classList.add('active-toggle');
+        tabPreview.classList.remove('active-toggle');
+        editorTabContent.style.display = 'block';
+        previewTabContent.style.display = 'none';
+        btnAddChapter.style.display = 'inline-flex'; // show Add Chapter
+        btnBulkAddChapters.style.display = 'inline-flex'; // show Bulk Add Chapters
+        renderChaptersList(); // refresh list
+      } else {
+        tabPreview.classList.add('active-toggle');
+        tabEditor.classList.remove('active-toggle');
+        editorTabContent.style.display = 'none';
+        previewTabContent.style.display = 'block';
+        btnAddChapter.style.display = 'none'; // hide Add Chapter
+        btnBulkAddChapters.style.display = 'none'; // hide Bulk Add Chapters
+        renderPreviewTab(); // render quick copy preview rows
+      }
+    }
+
+    // Load state from local storage (with legacy v1 fallback migration)
+    function loadStateFromLocalStorage() {
+      try {
+        const saved = localStorage.getItem('chapter_editor_state_v2');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (parsed) {
+            state.activeSubject = parsed.activeSubject || null;
+            state.savedSubjects = parsed.savedSubjects || {};
+            return;
+          }
+        }
+
+        // Migrate from v1 if present
+        const legacy = localStorage.getItem('chapter_editor_state');
+        if (legacy) {
+          const parsed = JSON.parse(legacy);
+          if (parsed && Array.isArray(parsed.sections)) {
+            const fallbackSubject = "Default Subject";
+            state.activeSubject = fallbackSubject;
+            state.savedSubjects[fallbackSubject] = {
+              sections: parsed.sections,
+              chapters: Array.isArray(parsed.chapters) ? parsed.chapters : []
+            };
+            saveStateToLocalStorage();
+            // Clean up v1
+            localStorage.removeItem('chapter_editor_state');
+            showToast("Migrated legacy workspace successfully!", "success");
+          }
+        }
+      } catch (err) {
+        console.error("Error reading from local storage", err);
+        showToast("Error loading saved state. Starting fresh.", "danger");
+      }
+    }
+
+    // Save state to local storage
+    function saveStateToLocalStorage() {
+      try {
+        localStorage.setItem('chapter_editor_state_v2', JSON.stringify(state));
+      } catch (err) {
+        console.error("Error writing to local storage", err);
+      }
+    }
+
+    // Render configuration fields for section names
+    function renderSectionInputs() {
+      const count = parseInt(numSectionsInput.value) || 1;
+      sectionNamesList.innerHTML = '';
+      
+      for (let i = 1; i <= count; i++) {
+        const row = document.createElement('div');
+        row.className = 'section-name-row fade-in';
+        
+        // Grab pre-configured default or just construct "Section X"
+        const defaultVal = defaultSectionNames[i-1] || `Section ${i}`;
+        
+        row.innerHTML = `
+          <div class="section-number">${i}</div>
+          <input type="text" class="form-input section-name-input" data-index="${i-1}" value="${defaultVal}" placeholder="e.g. Overview" required>
+        `;
+        sectionNamesList.appendChild(row);
+      }
+    }
+
+    // Render saved subjects suggestion list
+    function renderSuggestionsList() {
+      const subjects = Object.keys(state.savedSubjects);
+      if (subjects.length === 0) {
+        suggestionsPanel.style.display = 'none';
+        return;
+      }
+
+      suggestionsPanel.style.display = 'block';
+      suggestionsList.innerHTML = '';
+
+      subjects.forEach(sub => {
+        const item = document.createElement('div');
+        item.className = 'btn-suggestion fade-in';
+        
+        const chCount = state.savedSubjects[sub].chapters ? state.savedSubjects[sub].chapters.length : 0;
+        
+        item.innerHTML = `
+          <span style="cursor: pointer; display: flex; align-items: center; gap: 0.25rem;">📚 <strong>${escapeHTML(sub)}</strong> (${chCount} ch)</span>
+          <button class="btn-suggestion-delete" title="Delete subject data">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        `;
+
+        // Click to load subject
+        item.addEventListener('click', (e) => {
+          if (e.target.closest('.btn-suggestion-delete')) return;
+          
+          state.activeSubject = sub;
+          saveStateToLocalStorage();
+          switchTab('editor'); // default back to editor view on open
+          showEditorView();
+          showToast(`Resumed subject: ${sub}`, "success");
+        });
+
+        // Click to delete subject
+        const delBtn = item.querySelector('.btn-suggestion-delete');
+        delBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          showConfirmModal(
+            "Delete Subject?",
+            `Are you sure you want to permanently delete all local data for subject "${sub}"?`,
+            () => {
+              delete state.savedSubjects[sub];
+              saveStateToLocalStorage();
+              renderSuggestionsList();
+              showToast(`Deleted subject: ${sub}`, "warning");
+            }
+          );
+        });
+
+        suggestionsList.appendChild(item);
+      });
+    }
+
+    // Show setup view
+    function showConfigView() {
+      configView.style.display = 'block';
+      editorView.style.display = 'none';
+    }
+
+    // Show main editor view
+    function showEditorView() {
+      configView.style.display = 'none';
+      editorView.style.display = 'flex';
+      
+      currentSubjectDisplay.innerText = state.activeSubject;
+      
+      // Render components
+      renderTemplatePills();
+      
+      if (tabPreview.classList.contains('active-toggle')) {
+        renderPreviewTab();
+      } else {
+        renderChaptersList();
+      }
+    }
+
+    // Save setup config and move to editor
+    function saveConfigAndStart() {
+      const subjectName = subjectNameInput.value.trim();
+      if (!subjectName) {
+        showToast("Please enter a subject name", "warning");
+        subjectNameInput.style.borderColor = 'var(--danger)';
+        return;
+      }
+      subjectNameInput.style.borderColor = 'var(--border)';
+
+      const inputs = sectionNamesList.querySelectorAll('.section-name-input');
+      const tempSections = [];
+      
+      let allValid = true;
+      inputs.forEach(input => {
+        const val = input.value.trim();
+        if (!val) {
+          allValid = false;
+          input.style.borderColor = 'var(--danger)';
+        } else {
+          input.style.borderColor = 'var(--border)';
+          tempSections.push(val);
+        }
+      });
+
+      if (!allValid) {
+        showToast("Please provide names for all sections", "warning");
+        return;
+      }
+
+      state.activeSubject = subjectName;
+
+      // Initialize subject data if it doesn't exist, else merge sections
+      if (!state.savedSubjects[subjectName]) {
+        state.savedSubjects[subjectName] = {
+          sections: tempSections,
+          chapters: []
+        };
+        // Add a first default chapter
+        addChapter(false);
+      } else {
+        // If subject exists, overwrite/update templates
+        state.savedSubjects[subjectName].sections = tempSections;
+        if (!state.savedSubjects[subjectName].chapters) {
+          state.savedSubjects[subjectName].chapters = [];
+        }
+        if (state.savedSubjects[subjectName].chapters.length === 0) {
+          addChapter(false);
+        }
+      }
+      
+      saveStateToLocalStorage();
+      switchTab('editor'); // default back to editor on first config start
+      showEditorView();
+      showToast(`Loaded subject: ${subjectName}`, "success");
+    }
+
+    // Render template pills in header
+    function renderTemplatePills() {
+      templateSectionsContainer.innerHTML = '';
+      const activeData = state.savedSubjects[state.activeSubject];
+      if (!activeData || !activeData.sections) return;
+
+      activeData.sections.forEach((sec, idx) => {
+        const pill = document.createElement('div');
+        pill.className = 'section-pill';
+        pill.innerHTML = `
+          <span class="section-pill-number">${idx + 1}</span>
+          <span>${escapeHTML(sec)}</span>
+        `;
+        templateSectionsContainer.appendChild(pill);
+      });
+    }
+
+    // Add a new chapter structure
+    function addChapter(triggerRender = true) {
+      if (!state.activeSubject || !state.savedSubjects[state.activeSubject]) return;
+      const activeData = state.savedSubjects[state.activeSubject];
+
+      const chapterId = 'ch_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+      const chNumber = activeData.chapters.length + 1;
+      
+      const newChapter = {
+        id: chapterId,
+        title: `Chapter ${chNumber}`,
+        content: {}
+      };
+      
+      // Initialize empty content for each section
+      activeData.sections.forEach(sec => {
+        newChapter.content[sec] = "";
+      });
+      
+      activeData.chapters.push(newChapter);
+      saveStateToLocalStorage();
+      
+      if (triggerRender) {
+        renderChaptersList();
+        
+        // Scroll to the bottom of the chapters list to see the newly added chapter
+        setTimeout(() => {
+          const newChCard = document.getElementById(chapterId);
+          if (newChCard) {
+            newChCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            newChCard.querySelector('.chapter-title-input').focus();
+          }
+        }, 100);
+        
+        showToast("Added new chapter card!", "success");
+      }
+    }
+
+    // Process bulk chapters submission
+    function submitBulkChapters() {
+      if (!state.activeSubject || !state.savedSubjects[state.activeSubject]) return;
+      const activeData = state.savedSubjects[state.activeSubject];
+      
+      const rawInput = bulkChaptersInput.value.trim();
+      if (!rawInput) {
+        showToast("Please enter some chapter names.", "warning");
+        return;
+      }
+      
+      let names = [];
+      
+      // Try parsing as JSON array
+      if (rawInput.startsWith('[') && rawInput.endsWith(']')) {
+        try {
+          const parsed = JSON.parse(rawInput);
+          if (Array.isArray(parsed)) {
+            names = parsed.map(n => String(n).trim()).filter(n => n.length > 0);
+          } else {
+            throw new Error("JSON is not an array");
+          }
+        } catch (e) {
+          // If JSON parse fails, fallback to splitting by lines
+          names = rawInput.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+        }
+      } else {
+        // Just split by newline
+        names = rawInput.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+      }
+      
+      if (names.length === 0) {
+        showToast("No valid chapter names found.", "warning");
+        return;
+      }
+      
+      // Add each chapter
+      names.forEach((name, i) => {
+        const chapterId = 'ch_' + Date.now() + '_' + i + '_' + Math.floor(Math.random() * 1000);
+        const newChapter = {
+          id: chapterId,
+          title: name,
+          content: {}
+        };
+        
+        // Initialize empty content for each section
+        activeData.sections.forEach(sec => {
+          newChapter.content[sec] = "";
+        });
+        
+        activeData.chapters.push(newChapter);
+      });
+      
+      saveStateToLocalStorage();
+      renderChaptersList();
+      bulkModal.style.display = 'none';
+      showToast(`Successfully added ${names.length} chapters!`, "success");
+    }
+
+    // Delete a chapter
+    function deleteChapter(id) {
+      if (!state.activeSubject || !state.savedSubjects[state.activeSubject]) return;
+      const activeData = state.savedSubjects[state.activeSubject];
+
+      const chIndex = activeData.chapters.findIndex(ch => ch.id === id);
+      if (chIndex === -1) return;
+      
+      const chTitle = activeData.chapters[chIndex].title || `Chapter ${chIndex + 1}`;
+      
+      showConfirmModal(
+        "Delete Chapter?", 
+        `Are you sure you want to delete "${chTitle}"? This will permanently erase its section content.`,
+        () => {
+          const card = document.getElementById(id);
+          if (card) {
+            card.classList.add('slide-out');
+            card.addEventListener('animationend', () => {
+              activeData.chapters = activeData.chapters.filter(ch => ch.id !== id);
+              saveStateToLocalStorage();
+              renderChaptersList();
+              showToast("Chapter deleted successfully", "warning");
+            });
+          }
+        }
+      );
+    }
+
+    // Render the main list of chapters (Editor Mode)
+    function renderChaptersList() {
+      chaptersList.innerHTML = '';
+      if (!state.activeSubject || !state.savedSubjects[state.activeSubject]) return;
+      const activeData = state.savedSubjects[state.activeSubject];
+      
+      if (activeData.chapters.length === 0) {
+        chaptersList.innerHTML = `
+          <div class="empty-state fade-in">
+            <div class="empty-state-icon">📖</div>
+            <h3>No Chapters Created Yet</h3>
+            <p>Ready to start organizing? Click below to create your first chapter for this subject.</p>
+            <button id="btn-empty-add" class="btn btn-primary">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+              Add First Chapter
+            </button>
+          </div>
+        `;
+        
+        document.getElementById('btn-empty-add').addEventListener('click', () => {
+          addChapter();
+        });
+        return;
+      }
+      
+      activeData.chapters.forEach((chapter, index) => {
+        const chCard = document.createElement('div');
+        chCard.className = 'chapter-card fade-in';
+        chCard.id = chapter.id;
+        
+        // Build card HTML structure
+        let cardHTML = `
+          <div class="chapter-card-header">
+            <div class="chapter-title-wrapper">
+              <span class="chapter-badge">Ch ${index + 1}</span>
+              <input type="text" class="chapter-title-input" value="${escapeHTML(chapter.title)}" placeholder="e.g. Introduction to Physics" data-chapter-id="${chapter.id}">
+            </div>
+            <button class="btn-delete-chapter" data-delete-id="${chapter.id}" title="Delete Chapter">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            </button>
+          </div>
+          <div class="chapter-sections">
+        `;
+        
+        // Loop over the sections config
+        activeData.sections.forEach((sectionName, secIdx) => {
+          const textareaId = `ta_${chapter.id}_${secIdx}`;
+          const currentTextValue = chapter.content[sectionName] || "";
+          
+          cardHTML += `
+            <div class="chapter-section-item">
+              <div class="section-meta-row">
+                <span class="section-label">
+                  <span class="section-label-number">${secIdx + 1}.</span>
+                  ${escapeHTML(sectionName)}
+                </span>
+                <div class="section-actions">
+                  <button class="btn-icon-sm btn-copy-section" data-textarea-id="${textareaId}" title="Copy Section Content">
+                    <span class="tooltip-text">Copy Text</span>
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+                  </button>
+                  <button class="btn-icon-sm btn-paste-section" data-textarea-id="${textareaId}" title="Paste Content Here">
+                    <span class="tooltip-text">Paste Text</span>
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+                  </button>
+                </div>
+              </div>
+              <textarea id="${textareaId}" class="section-textarea" placeholder="Type or paste content for this section..." data-chapter-id="${chapter.id}" data-section-name="${escapeHTML(sectionName)}">${escapeHTML(currentTextValue)}</textarea>
+            </div>
+          `;
+        });
+        
+        cardHTML += `</div>`;
+        chCard.innerHTML = cardHTML;
+        chaptersList.appendChild(chCard);
+      });
+      
+      // Bind inline events inside chapters list
+      bindChapterListEvents();
+    }
+
+    // Render Preview Mode (Row-by-row layout)
+    function renderPreviewTab() {
+      previewTabContent.innerHTML = '';
+      if (!state.activeSubject || !state.savedSubjects[state.activeSubject]) return;
+      const activeData = state.savedSubjects[state.activeSubject];
+
+      if (activeData.chapters.length === 0) {
+        previewTabContent.innerHTML = `
+          <div class="empty-state fade-in">
+            <div class="empty-state-icon">📖</div>
+            <h3>No Chapters Created Yet</h3>
+            <p>Please switch back to Editor Mode to add chapters and contents first.</p>
+          </div>
+        `;
+        return;
+      }
+
+      // Title header inside preview
+      const previewHeader = document.createElement('div');
+      previewHeader.className = 'template-info-title';
+      previewHeader.style.marginBottom = '1rem';
+      previewHeader.innerText = 'Quick-Copy Chapter Sections';
+      previewTabContent.appendChild(previewHeader);
+
+      activeData.chapters.forEach((chapter, index) => {
+        const row = document.createElement('div');
+        row.className = 'preview-row-card fade-in';
+
+        let buttonsHTML = '';
+        activeData.sections.forEach(secName => {
+          const contentText = chapter.content[secName] || "";
+          const isEmpty = contentText.trim() === "";
+
+          buttonsHTML += `
+            <button class="btn-preview-copy ${isEmpty ? 'empty-sec' : ''}" 
+                    data-chapter-id="${chapter.id}" 
+                    data-section-name="${escapeHTML(secName)}" 
+                    title="Copy ${escapeHTML(secName)} Content">
+              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+              </svg>
+              ${escapeHTML(secName)}
+            </button>
+          `;
+        });
+
+        row.innerHTML = `
+          <div class="preview-row-title-wrapper">
+            <span class="preview-row-badge">Ch ${index + 1}</span>
+            <span class="preview-row-title" title="${escapeHTML(chapter.title)}">${escapeHTML(chapter.title)}</span>
+          </div>
+          <div class="preview-row-actions">
+            ${buttonsHTML}
+          </div>
+        `;
+
+        previewTabContent.appendChild(row);
+      });
+
+      // Bind click triggers for copy buttons in the preview tab
+      const copyBtns = previewTabContent.querySelectorAll('.btn-preview-copy');
+      copyBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const chId = btn.getAttribute('data-chapter-id');
+          const secName = btn.getAttribute('data-section-name');
+          const chapter = activeData.chapters.find(ch => ch.id === chId);
+
+          if (chapter) {
+            const textVal = chapter.content[secName] || "";
+            copyPreviewText(textVal, secName, chapter.title, btn);
+          }
+        });
+      });
+    }
+
+    // Copy text action inside preview tab
+    function copyPreviewText(text, secName, chapterTitle, buttonElement) {
+      if (!text.trim()) {
+        showToast(`Section "${secName}" in "${chapterTitle}" is empty!`, "warning");
+        return;
+      }
+
+      navigator.clipboard.writeText(text).then(() => {
+        showToast(`Copied ${secName} content for "${chapterTitle}"!`, "success");
+        
+        buttonElement.classList.add('preview-copied');
+        const origHTML = buttonElement.innerHTML;
+        buttonElement.innerHTML = `
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+          Copied!
+        `;
+        
+        setTimeout(() => {
+          buttonElement.classList.remove('preview-copied');
+          buttonElement.innerHTML = origHTML;
+        }, 1500);
+      }).catch(err => {
+        console.error("Copy failed: ", err);
+        showToast("Failed to copy content.", "danger");
+      });
+    }
+
+    // Bind event handlers inside dynamic chapters list (Editor Mode)
+    function bindChapterListEvents() {
+      if (!state.activeSubject || !state.savedSubjects[state.activeSubject]) return;
+      const activeData = state.savedSubjects[state.activeSubject];
+
+      // 1. Chapter Title Input Change (autosaves in real time)
+      const titleInputs = chaptersList.querySelectorAll('.chapter-title-input');
+      titleInputs.forEach(input => {
+        input.addEventListener('input', (e) => {
+          const chId = e.target.getAttribute('data-chapter-id');
+          const value = e.target.value;
+          const chapter = activeData.chapters.find(ch => ch.id === chId);
+          if (chapter) {
+            chapter.title = value;
+            saveStateToLocalStorage();
+          }
+        });
+      });
+
+      // 2. Textarea input updates (autosaves in real time)
+      const textareas = chaptersList.querySelectorAll('.section-textarea');
+      textareas.forEach(textarea => {
+        textarea.addEventListener('input', (e) => {
+          const chId = e.target.getAttribute('data-chapter-id');
+          const secName = e.target.getAttribute('data-section-name');
+          const value = e.target.value;
+          const chapter = activeData.chapters.find(ch => ch.id === chId);
+          if (chapter) {
+            chapter.content[secName] = value;
+            saveStateToLocalStorage();
+          }
+        });
+      });
+
+      // 3. Delete Chapter button clicks
+      const deleteButtons = chaptersList.querySelectorAll('.btn-delete-chapter');
+      deleteButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const id = btn.getAttribute('data-delete-id');
+          deleteChapter(id);
+        });
+      });
+
+      // 4. Copy Section click handler
+      const copyButtons = chaptersList.querySelectorAll('.btn-copy-section');
+      copyButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const taId = btn.getAttribute('data-textarea-id');
+          const textarea = document.getElementById(taId);
+          if (textarea) {
+            copyTextToClipboard(textarea.value, btn);
+          }
+        });
+      });
+
+      // 5. Paste Section click handler
+      const pasteButtons = chaptersList.querySelectorAll('.btn-paste-section');
+      pasteButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const taId = btn.getAttribute('data-textarea-id');
+          const textarea = document.getElementById(taId);
+          if (textarea) {
+            pasteTextFromClipboard(textarea, btn);
+          }
+        });
+      });
+    }
+
+    // Copy action helper
+    function copyTextToClipboard(text, buttonElement) {
+      if (!text) {
+        showToast("No content to copy!", "warning");
+        return;
+      }
+
+      navigator.clipboard.writeText(text).then(() => {
+        showToast("Section content copied!", "success");
+        
+        // Add visual active success class to button for 2 seconds
+        buttonElement.classList.add('success-active');
+        const tooltip = buttonElement.querySelector('.tooltip-text');
+        if (tooltip) tooltip.innerText = "Copied!";
+        
+        // Revert icon SVG to copy
+        const origSVG = buttonElement.innerHTML;
+        buttonElement.innerHTML = `
+          <span class="tooltip-text">Copied!</span>
+          <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+        `;
+        
+        setTimeout(() => {
+          buttonElement.classList.remove('success-active');
+          buttonElement.innerHTML = origSVG;
+        }, 1500);
+      }).catch(err => {
+        console.error("Could not copy text: ", err);
+        showToast("Failed to copy content.", "danger");
+      });
+    }
+
+    // Paste action helper
+    async function pasteTextFromClipboard(textareaElement, buttonElement) {
+      try {
+        const text = await navigator.clipboard.readText();
+        if (text === undefined) {
+          throw new Error("Empty text or permission denied");
+        }
+        
+        textareaElement.value = text;
+        // Trigger manual input event to save to state
+        textareaElement.dispatchEvent(new Event('input'));
+        
+        showToast("Pasted successfully!", "success");
+        
+        // Animate button success state
+        buttonElement.classList.add('success-active');
+        const tooltip = buttonElement.querySelector('.tooltip-text');
+        if (tooltip) tooltip.innerText = "Pasted!";
+        
+        const origSVG = buttonElement.innerHTML;
+        buttonElement.innerHTML = `
+          <span class="tooltip-text">Pasted!</span>
+          <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+        `;
+        
+        setTimeout(() => {
+          buttonElement.classList.remove('success-active');
+          buttonElement.innerHTML = origSVG;
+        }, 1500);
+      } catch (err) {
+        console.error("Paste failed: ", err);
+        showToast("Paste blocked. Press Ctrl+V inside the text box instead.", "warning");
+      }
+    }
+
+    // Export subject state as JSON file named after the subject
+    function exportDataAsJson() {
+      if (!state.activeSubject || !state.savedSubjects[state.activeSubject]) return;
+      const activeData = state.savedSubjects[state.activeSubject];
+
+      if (activeData.chapters.length === 0) {
+        showToast("No chapters to export!", "warning");
+        return;
+      }
+      
+      try {
+        const exportObj = {
+          subject: state.activeSubject,
+          sections: activeData.sections,
+          chapters: activeData.chapters.map(ch => ({
+            title: ch.title,
+            content: ch.content
+          }))
+        };
+        
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj, null, 2));
+        const downloadAnchor = document.createElement('a');
+        downloadAnchor.setAttribute("href", dataStr);
+        
+        // Formulate a safe filename based on subject name
+        const cleanFilename = state.activeSubject.toLowerCase().replace(/[^a-z0-9]/g, "_") || "subject";
+        downloadAnchor.setAttribute("download", `${cleanFilename}_data.json`);
+        
+        document.body.appendChild(downloadAnchor);
+        downloadAnchor.click();
+        downloadAnchor.remove();
+        
+        showToast("Data exported as JSON file!", "success");
+      } catch (err) {
+        console.error("Export failed: ", err);
+        showToast("Export failed.", "danger");
+      }
+    }
+
+    // Import JSON file handler and load it into active state
+    function handleImportFile(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const imported = JSON.parse(e.target.result);
+          
+          if (!imported || !Array.isArray(imported.sections) || !Array.isArray(imported.chapters)) {
+            throw new Error("Invalid format. Must contain 'sections' array and 'chapters' array.");
+          }
+
+          // Fallback subject name from imported JSON key, or the filename, or a default
+          const importedSubject = imported.subject || file.name.replace(/\.[^/.]+$/, "").replace(/_data$/, "").replace(/_/g, " ") || "Imported Subject";
+
+          // Verify each chapter matches standard
+          const validatedChapters = imported.chapters.map((ch, idx) => {
+            const content = {};
+            imported.sections.forEach(sec => {
+              content[sec] = (ch.content && ch.content[sec]) ? ch.content[sec] : "";
+            });
+            return {
+              id: 'ch_' + Date.now() + '_' + idx + '_' + Math.floor(Math.random() * 100),
+              title: ch.title || `Chapter ${idx + 1}`,
+              content: content
+            };
+          });
+
+          const importAction = () => {
+            state.activeSubject = importedSubject;
+            state.savedSubjects[importedSubject] = {
+              sections: imported.sections,
+              chapters: validatedChapters
+            };
+            saveStateToLocalStorage();
+            showEditorView();
+            showToast(`Imported subject "${importedSubject}"!`, "success");
+          };
+
+          // Ask to overwrite if active data is present
+          if (state.activeSubject) {
+            showConfirmModal(
+              "Import Subject?",
+              `Importing this file will load "${importedSubject}" as your active subject workspace.`,
+              importAction
+            );
+          } else {
+            importAction();
+          }
+
+        } catch (err) {
+          console.error("Import parsing failed: ", err);
+          showToast(`Import failed: ${err.message || 'Invalid JSON syntax'}`, "danger");
+        }
+        
+        // Reset file input element so same file can be selected again
+        importFileInput.value = '';
+      };
+      
+      reader.readAsText(file);
+    }
+
+    // Modal helpers
+    function showConfirmModal(title, desc, callback) {
+      modalTitle.innerText = title;
+      modalDesc.innerText = desc;
+      modalActionCallback = callback;
+      confirmModal.style.display = 'flex';
+    }
+
+    function hideConfirmModal() {
+      confirmModal.style.display = 'none';
+      modalActionCallback = null;
+    }
+
+    // Toast helpers
+    function showToast(message, type = 'info') {
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      
+      let typeEmoji = "ℹ️";
+      if (type === 'success') typeEmoji = "✅";
+      if (type === 'warning') typeEmoji = "⚠️";
+      if (type === 'danger') typeEmoji = "🚨";
+      
+      toast.innerHTML = `<span>${typeEmoji}</span> <span>${message}</span>`;
+      
+      toastContainer.appendChild(toast);
+      
+      // Auto dismiss after 3.5 seconds
+      setTimeout(() => {
+        toast.classList.add('toast-out');
+        toast.addEventListener('animationend', () => {
+          toast.remove();
+        });
+      }, 3500);
+    }
+
+    // Helper to sanitize dynamic string values to prevent basic HTML injects
+    function escapeHTML(str) {
+      if (!str) return '';
+      return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+  </script>
+</body>
+</html>
